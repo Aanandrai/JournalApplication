@@ -5,10 +5,13 @@ import com.project.journalApp.entity.JournalEntry;
 import com.project.journalApp.entity.User;
 import com.project.journalApp.service.JournalEntryService;
 import com.project.journalApp.service.UserService;
+import org.apache.tomcat.util.http.parser.Authorization;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -22,50 +25,43 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping
-    public ResponseEntity<?> getAllUser(){
+//    @GetMapping
+//    public ResponseEntity<?> getAllUser(){
+//
+//        try{
+//            return new ResponseEntity<>(userService.getAll() ,HttpStatus.OK);
+//
+//        }catch(Exception e){
+//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 
-        try{
-            return new ResponseEntity<>(userService.getAll() ,HttpStatus.OK);
 
-        }catch(Exception e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 
-    @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody User user){
-        try{
-            userService.saveEntry(user);
-            return new ResponseEntity<>(user,HttpStatus.OK);
+//    @GetMapping("/id/{myId}")
+//    public ResponseEntity<?> getUserEntryById(@PathVariable ObjectId myId){
+//        try{
+//            Optional<User> user=userService.findById(myId);
+//            if(user.isPresent()){
+//                return new ResponseEntity<>(user ,HttpStatus.OK);
+//            }
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }catch(Exception e){
+//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//
+//    }
 
-        }catch(Exception e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @GetMapping("/id/{myId}")
-    public ResponseEntity<?> getUserEntryById(@PathVariable ObjectId myId){
-        try{
-            Optional<User> user=userService.findById(myId);
-            if(user.isPresent()){
-                return new ResponseEntity<>(user ,HttpStatus.OK);
-            }
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }catch(Exception e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-    }
-
-    @DeleteMapping("/id/{myId}")
+    @DeleteMapping
     public ResponseEntity<?> deleteById(@PathVariable ObjectId myId){
         try{
-            Optional<User> user=userService.findById(myId);
-            if(user.isPresent()){
-                userService.deleteById(myId);
-                return new ResponseEntity<>(user ,HttpStatus.OK);
-            }
+            Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+            userService.deleteByUserName(authentication.getName());
+//            Optional<User> user=userService.findById(myId);
+//            if(user.isPresent()){
+//                userService.deleteById(myId);
+//                return new ResponseEntity<>(user ,HttpStatus.OK);
+//            }
 
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -75,8 +71,10 @@ public class UserController {
     }
 
 
-    @PutMapping("/{userName}")
-    public ResponseEntity<?> updateUser(@PathVariable String userName, @RequestBody User user){
+    @PutMapping
+    public ResponseEntity<?> updateUser(@RequestBody User user){
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        String userName=authentication.getName();
 
         User userInDb = userService.findByUserName(userName);
 

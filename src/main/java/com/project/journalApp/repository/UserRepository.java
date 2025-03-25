@@ -11,4 +11,6 @@ public interface UserRepository extends MongoRepository<User, ObjectId> {
 //   MongoRepository <Entity,id_type>
 
     User findByUserName(String username);
+
+    void deleteByUserName(String userName);
 }
