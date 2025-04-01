@@ -40,10 +40,25 @@ public class UserService {
 
     }
 
+    public void saveAdmin(User user) {
+        try {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setRoles(Arrays.asList("USER","ADMIN"));
+            userRepository.save(user);
+        } catch (Exception e) {
+            log.error("Exception ",e);
+            System.out.println("Error :" +e);
+        }
+
+    }
+
     public void saveUser(User user){
         userRepository.save(user);
     }
 
+    public List<User> getAll(){
+        return userRepository.findAll();
+    }
 
 
     public Optional<User> findById(ObjectId id) {
