@@ -57,11 +57,11 @@ public class UserController {
         try{
             Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
             userService.deleteByUserName(authentication.getName());
-//            Optional<User> user=userService.findById(myId);
-//            if(user.isPresent()){
-//                userService.deleteById(myId);
-//                return new ResponseEntity<>(user ,HttpStatus.OK);
-//            }
+            Optional<User> user=userService.findById(myId);
+            if(user.isPresent()){
+                userService.deleteByUserName(authentication.getName());
+                return new ResponseEntity<>(user ,HttpStatus.OK);
+            }
 
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -81,7 +81,7 @@ public class UserController {
             if(userInDb !=null){
                 userInDb.setUserName(user.getUserName());
                 userInDb.setPassword(user.getPassword());
-                userService.saveEntry(userInDb);
+                userService.saveUser(userInDb);
         }
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

@@ -40,14 +40,14 @@ public class JournalEntryService {
             journalEntry.setDate(LocalDateTime.now());
             JournalEntry saved=journalEntryRepository.save(journalEntry);
             user.getJournalEntries().add(saved);
-            userService.saveEntry(user);
+            userService.saveUser(user);
         }catch(Exception e){
             throw new RuntimeException("Error occurred while saving journal entry", e);
         }
 
     }
 
-
+//
     public void saveEntry(JournalEntry journalEntry){
         try{
             journalEntryRepository.save(journalEntry);
@@ -68,23 +68,25 @@ public class JournalEntryService {
         return journalEntryRepository.findById(id);
     }
 
-
+    @Transactional
     public void deleteById(ObjectId id,String userName){
         User user =userService.findByUserName(userName);
         if (user == null) {
             throw new UserNotFoundException("User not found with username: " + userName);
 
         }
-        user.getJournalEntries().removeIf(x->x.getId().equals(id));
-        userService.saveEntry(user);
-        Optional<JournalEntry> journalEntry = journalEntryRepository.findById(id);
-
-        if(!journalEntry.isPresent()){
+        boolean removed=user.getJournalEntries().removeIf(x->x.getId().equals(id));
+        if(!removed){
             throw new UserNotFoundException("Journal Not Found");
         }
+        userService.saveUser(user);
         journalEntryRepository.deleteById(id);
 
     }
+
+
+
+
 
 
 
