@@ -1,10 +1,12 @@
 package com.project.journalApp.controller;
 
 
+import com.project.journalApp.api.response.WeatherResponse;
 import com.project.journalApp.entity.JournalEntry;
 import com.project.journalApp.entity.User;
 import com.project.journalApp.service.JournalEntryService;
 import com.project.journalApp.service.UserService;
+import com.project.journalApp.service.WeatherService;
 import org.apache.tomcat.util.http.parser.Authorization;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private WeatherService weatherService;
 
 //    @GetMapping
 //    public ResponseEntity<?> getAllUser(){
@@ -85,6 +90,18 @@ public class UserController {
         }
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+
+    @GetMapping
+    public ResponseEntity<?> greeting(){
+        Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
+        WeatherResponse weatherResponse=weatherService.getWeather("Mumbai");
+        String greeting="";
+        if(weatherResponse!=null){
+            greeting=", Weather feels like "+weatherResponse.getCurrent().getFeelslike();
+        }
+        return new ResponseEntity<>("Hi "+ authentication.getName() + greeting, HttpStatus.OK);
     }
 
 
