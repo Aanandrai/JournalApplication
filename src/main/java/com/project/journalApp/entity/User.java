@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@Document
+@Document(collection ="user")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,6 +27,10 @@ public class User {
 
     @NonNull
     private String password;
+
+    private String email;
+
+    private boolean sentimentAnalysis;
 
     @DBRef
     private List<JournalEntry> journalEntries=new ArrayList<>();
